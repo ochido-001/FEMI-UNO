@@ -1,0 +1,49 @@
+#include <Arduino.h>
+#include "Ultrasonic.h"
+
+// Define the trigger and echo pins for the ultrasonic sensor
+const int trigPin = 12;
+const int echoPin = 13;
+
+// Define the maximum and minimum water levels in centimeters
+const int maxWaterLevel = 50;
+const int minWaterLevel = 10;
+
+// Create an instance of the Ultrasonic class
+Ultrasonic ultrasonic(trigPin, echoPin);
+
+// Define the LED pin to indicate water level status
+const int ledPin = 8;
+
+void setup() {
+  // Initialize serial communication
+  Serial.begin(9600);
+
+  // Set the LED pin as output
+  pinMode(ledPin, OUTPUT);
+}
+
+void loop() {
+  // Measure the distance to the water surface
+  long distanceCm = ultrasonic.ranging(CM);
+
+  // Calculate the water level in centimeters
+  int waterLevel = maxWaterLevel - distanceCm;
+
+  // Check if the water level is within the acceptable range
+  if (waterLevel >= minWaterLevel && waterLevel <= maxWaterLevel) {
+    // Water level is normal, turn off the LED
+    digitalWrite(ledPin, LOW);
+  } else {
+    // Water level is outside the acceptable range, turn on the LED
+    digitalWrite(ledPin, HIGH);
+  }
+
+  // Print the water level to the serial monitor
+  Serial.print("Water Level: ");
+  Serial.print(waterLevel);
+  Serial.println(" cm");
+
+  // Delay between measurements
+  delay(1000);
+}
